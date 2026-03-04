@@ -15,10 +15,10 @@ fun main(args: Array<String>) {
     try {
         while (true){
             when(b17.value){
-                true -> print("Botão pressionado!")
-                false -> print("Botão livre!")
+                true -> println("Botão pressionado!")
+                false -> println("Botão livre!")
             }
-            Thread.sleep(400)
+            Thread.sleep(1000)
         }
     } finally {
         b17.close()
