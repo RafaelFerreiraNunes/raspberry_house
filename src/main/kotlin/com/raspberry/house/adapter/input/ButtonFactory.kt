@@ -1,16 +1,15 @@
 package com.raspberry.house.adapter.input
 
-import com.diozero.api.DigitalInputDevice
-import com.diozero.api.GpioEventTrigger
+import com.diozero.api.DebouncedDigitalInputDevice
 import com.diozero.api.GpioPullUpDown
 
 object ButtonFactory {
 
-    fun createButton(pin: Int): DigitalInputDevice {
-        return DigitalInputDevice(
+    fun createButton(pin: Int): DebouncedDigitalInputDevice {
+        return DebouncedDigitalInputDevice(
             pin,
             GpioPullUpDown.NONE,
-            GpioEventTrigger.BOTH)
+            50)
     }
 
 }

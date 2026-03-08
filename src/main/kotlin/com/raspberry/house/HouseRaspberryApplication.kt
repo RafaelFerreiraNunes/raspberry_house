@@ -12,16 +12,13 @@ fun main(args: Array<String>) {
 
     val b17 = ButtonFactory.createButton(17)
 
-    try {
-        while (true){
-            when(b17.value){
-                true -> println("Botão pressionado!")
-                false -> println("Botão livre!")
-            }
-            Thread.sleep(1000)
+    b17.addListener { event ->
+        if (event.isActive) {
+            println("Button active")
         }
-    } finally {
-        b17.close()
     }
+
+    readln()
+    b17.close()
 
 }
