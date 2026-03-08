@@ -1,6 +1,7 @@
 package com.raspberry.house
 
 import com.raspberry.house.adapter.input.ButtonFactory
+import com.raspberry.house.adapter.output.RequestOut
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
@@ -15,6 +16,7 @@ fun main(args: Array<String>) {
     b17.addListener { event ->
         if (event.isActive) {
             println("Button active")
+            RequestOut.sendCommandLed("1")
         }
     }
 
