@@ -11,16 +11,4 @@ class HouseRaspberryApplication
 fun main(args: Array<String>) {
     runApplication<HouseRaspberryApplication>(*args)
 
-    val b17 = ButtonFactory.createButton(17)
-
-    b17.addListener { event ->
-        if (event.isActive) {
-            println("Button active")
-            RequestOut.sendCommandLed("1")
-        }
-    }
-
-    readln()
-    b17.close()
-
 }

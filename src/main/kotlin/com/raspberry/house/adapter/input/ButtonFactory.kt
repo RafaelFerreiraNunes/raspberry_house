@@ -8,7 +8,7 @@ object ButtonFactory {
     fun createButton(pin: Int): DebouncedDigitalInputDevice {
         return DebouncedDigitalInputDevice(
             pin,
-            GpioPullUpDown.NONE,
+            GpioPullUpDown.PULL_DOWN,
             50)
     }
 
