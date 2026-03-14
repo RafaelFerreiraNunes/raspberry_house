@@ -10,8 +10,12 @@ class ButtonListener {
     fun adicionarListener(button: DebouncedDigitalInputDevice, ledAssociado: String) {
         button.addListener { event ->
             if (event.isActive) {
+                val startTime = System.currentTimeMillis()
                 println("Button throttle ${button.name}")
-                RequestOut.sendCommandLed(ledAssociado)
+                RequestOut.sendCommandLed(ledAssociado).thenRun {
+                    val endTime = System.currentTimeMillis()
+                    println("Tempo total para acender o LED: ${endTime - startTime}ms")
+                }
             }
         }
     }
