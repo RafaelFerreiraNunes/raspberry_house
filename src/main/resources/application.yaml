@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: house_raspberry
+
+app:
+  communication:
+    type: rest
+
+grpc:
+  client:
+    ledServer:
+      address: 'static://app-led:9090'
+      negotiationType: plaintext
