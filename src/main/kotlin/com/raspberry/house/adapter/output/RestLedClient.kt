@@ -2,6 +2,7 @@ package com.raspberry.house.adapter.output
 
 import com.raspberry.house.client.LedClient
 import kotlinx.coroutines.future.await
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 import java.net.URI
@@ -16,9 +17,12 @@ class RestLedClient : LedClient {
 
     private val httpClient = HttpClient.newHttpClient()
 
+    @Value("\${app.led.url:http://localhost:8090}")
+    lateinit var ledBaseUrl: String
+
     override suspend fun sendCommand(ledId: String) {
 
-        val url = "http://app-led:8090/led/$ledId"
+        val url = "$ledBaseUrl/led/$ledId"
 
         val request = HttpRequest.newBuilder()
             .uri(URI.create(url))

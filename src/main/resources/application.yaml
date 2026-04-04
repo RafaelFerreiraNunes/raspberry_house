@@ -4,10 +4,12 @@ spring:
 
 app:
   communication:
-    type: rest
+    type: rest #rest ou grpc
+  led:
+    url: ${APP_LED_URL:http://localhost:8090}
 
 grpc:
   client:
     ledServer:
-      address: 'static://app-led:9090'
+      address: 'static://${GRPC_LED_HOST:localhost}:9090'
       negotiationType: plaintext

@@ -9,8 +9,6 @@ RUN mvn package -DskipTests
 
 FROM amazoncorretto:25-al2023
 
-RUN yum install -y libgpiod && yum clean all
-
 WORKDIR /app
 COPY --from=build /app/target/application.jar app.jar
 
