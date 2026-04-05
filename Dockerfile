@@ -7,7 +7,13 @@ RUN mvn dependency:go-offline
 COPY src ./src
 RUN mvn package -DskipTests
 
-FROM amazoncorretto:25-al2023
+FROM ubuntu:24.04
+
+RUN apt-get update && apt-get install -y \
+    openjdk-25-jdk-headless \
+    libgpiod-dev \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY --from=build /app/target/application.jar app.jar
