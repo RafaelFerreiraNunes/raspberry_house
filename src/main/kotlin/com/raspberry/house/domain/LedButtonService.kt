@@ -1,6 +1,6 @@
 package com.raspberry.house.domain
 
-import com.diozero.api.DebouncedDigitalInputDevice
+import com.pi4j.io.gpio.digital.DigitalInput
 import com.raspberry.house.adapter.input.ButtonFactory
 import com.raspberry.house.adapter.input.ButtonListener
 import jakarta.annotation.PostConstruct
@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class LedButtonService(
+    private val buttonFactory: ButtonFactory,
     private val buttonListener: ButtonListener
 ) {
 
@@ -20,21 +21,21 @@ class LedButtonService(
         6  to "5",
         13 to "6"
     )
-    private val buttons = ArrayList<DebouncedDigitalInputDevice>(6)
+    private val buttons = ArrayList<DigitalInput>(6)
 
 
     @PostConstruct
     fun init() {
-        buttonLedMap.forEach { pin, led ->
-            val button = ButtonFactory.createButton(pin)
+        buttonLedMap.forEach { pin, ledId ->
+            val button = buttonFactory.createButton(pin)
             buttons.add(button)
-            buttonListener.adicionarListener(button, led)
+            buttonListener.adicionarListener(button, ledId)
         }
     }
 
     @PreDestroy
     fun cleanup() {
-        println("Fechando ButtonListener")
+        println("Encerrando botões e limpando listeners...")
         buttons.forEach { bt ->
             buttonListener.fecharListener(bt)
         }

@@ -1,6 +1,8 @@
 package com.raspberry.house.adapter.output
 
 import com.raspberry.house.client.LedClient
+import io.github.resilience4j.kotlin.retry.executeSuspendFunction
+import io.github.resilience4j.retry.RetryRegistry
 import kotlinx.coroutines.future.await
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -13,12 +15,17 @@ import java.util.concurrent.CompletableFuture
 
 @Service
 @ConditionalOnProperty(name = ["app.communication.type"], havingValue = "rest")
-class RestLedClient : LedClient {
+class RestLedClient(
+    private val retryRegistry: RetryRegistry
+) : LedClient {
 
     private val httpClient = HttpClient.newHttpClient()
 
     @Value("\${app.led.url:http://localhost:8090}")
     lateinit var ledBaseUrl: String
+
+    private val retry = retryRegistry.retry("ledService")
+
 
     override suspend fun sendCommand(ledId: String) {
 
@@ -30,11 +37,14 @@ class RestLedClient : LedClient {
             .build()
 
         try {
-            // .await() transforma o CompletableFuture em uma suspensão do Kotlin
-            httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString()).await()
-            println("REST: Comando enviado para $url")
+            retry.executeSuspendFunction {
+                // .await() transforma o CompletableFuture em uma suspensão do Kotlin
+                httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString()).await()
+                println("REST: Comando enviado para $url")
+            }
         } catch (e: Exception) {
-            println("Erro ao enviar REST: ${e.message}")
+            println("Erro persistente ao enviar REST: ${e.message}")
+            throw e // Precisamos relançar para o Resilience4j saber que falhou
         }
     }
 

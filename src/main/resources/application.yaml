@@ -2,6 +2,36 @@ spring:
   application:
     name: house_raspberry
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always
+
+#Incompatibilidade com Spring 4
+#resilience4j:
+#  retry:
+#    instances:
+#      ledService:
+#        maxAttempts: 3          # Tenta 3 vezes no total
+#        waitDuration: 500ms     # Espera meio segundo entre as tentativas
+#        enableExponentialBackoff: true # Aumenta o tempo de espera a cada falha
+#        exponentialBackoffMultiplier: 2 # 500ms -> 1s -> 2s
+#        retryExceptions:
+#          - io.grpc.StatusRuntimeException # Tenta de novo apenas se for erro de gRPC
+#  circuitbreaker:
+#    instances:
+#      ledService:
+#        registerHealthIndicator: true
+#        slidingWindowSize: 10          # Analisa as últimas 10 chamadas
+#        failureRateThreshold: 50       # Se 50% falharem, abre o circuito
+#        waitDurationInOpenState: 10s   # Espera 10s antes de ir para Half-Open
+#        permittedNumberOfCallsInHalfOpenState: 3 # Deixa 3 testes passarem no Half-Open
+#        slidingWindowType: COUNT_BASED
+
 app:
   communication:
     type: rest #rest ou grpc
@@ -13,3 +43,7 @@ grpc:
     ledServer:
       address: 'static://${GRPC_LED_HOST:localhost}:9090'
       negotiationType: plaintext
+
+logging:
+  level:
+    "org.springframework.context.support.PostProcessorRegistrationDelegate$BeanPostProcessorChecker": ERROR
