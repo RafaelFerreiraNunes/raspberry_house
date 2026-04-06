@@ -10,6 +10,7 @@ import net.devh.boot.grpc.client.inject.GrpcClient
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 import io.github.resilience4j.kotlin.circuitbreaker.executeSuspendFunction
+import org.slf4j.LoggerFactory
 
 @Service
 @ConditionalOnProperty(name = ["app.communication.type"], havingValue = "grpc")
@@ -22,6 +23,7 @@ class GrpcLedClient(
 
     private val retry = retryRegistry.retry("ledService")
     private val circuitBreaker = circuitBreakerRegistry.circuitBreaker("ledService")
+    private val log = LoggerFactory.getLogger(javaClass) // Declare o logger
 
     override suspend fun sendCommand(ledId: String) {
         try {
@@ -32,13 +34,13 @@ class GrpcLedClient(
 
             circuitBreaker.executeSuspendFunction {
                 retry.executeSuspendFunction {
-                    println("--- [DEBUG] Tentando chamada gRPC agora...")
+                    log.info("--- [DEBUG] Tentando chamada gRPC agora...")
                     val response = stub.changeStatus(request)
-                    println("gRPC: Resposta do servidor -> ${response.message}")
+                    log.info("gRPC: Resposta do servidor -> ${response.message}")
                 }
             }
         } catch (e: Exception) {
-            println("Falha na chamada gRPC: ${e.message}")
+            log.info("Falha na chamada gRPC: ${e.message}")
             throw e // Relançar para que o Resilience4j possa aplicar as políticas de retry/circuit breaker
         }
     }

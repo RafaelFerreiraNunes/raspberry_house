@@ -4,6 +4,7 @@ import com.raspberry.house.client.LedClient
 import io.github.resilience4j.kotlin.retry.executeSuspendFunction
 import io.github.resilience4j.retry.RetryRegistry
 import kotlinx.coroutines.future.await
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
@@ -20,6 +21,7 @@ class RestLedClient(
 ) : LedClient {
 
     private val httpClient = HttpClient.newHttpClient()
+    private val log = LoggerFactory.getLogger(javaClass) // Declare o logger
 
     @Value("\${app.led.url:http://localhost:8090}")
     lateinit var ledBaseUrl: String
@@ -40,10 +42,10 @@ class RestLedClient(
             retry.executeSuspendFunction {
                 // .await() transforma o CompletableFuture em uma suspensão do Kotlin
                 httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString()).await()
-                println("REST: Comando enviado para $url")
+                log.info("REST: Comando enviado para $url")
             }
         } catch (e: Exception) {
-            println("Erro persistente ao enviar REST: ${e.message}")
+            log.info("Erro persistente ao enviar REST: ${e.message}")
             throw e // Precisamos relançar para o Resilience4j saber que falhou
         }
     }
